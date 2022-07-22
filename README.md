@@ -2,6 +2,12 @@
 A social media platform enabling users to 💡post tweet, 💬reply, ❤like and 🤝follow others!
 ![twitter-preview](https://user-images.githubusercontent.com/36234793/180364385-59d2e252-566a-499d-93e9-57a6224e0912.PNG)
 
+This project is now live at https://tweet-tweet.herokuapp.com/  
+Use the default accounts below or register your own one!
+<pre><code>(User) user2 / 123 
+(Admin) root / 12345678 (Route: /admin/signin)</code></pre>
+
+
 ## Features
 ### User
 * Browse all tweets on the site
