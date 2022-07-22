@@ -24,12 +24,12 @@ const tweetController = {
       })
     ])
       .then(([tweets, users]) => {
-        const likedTweetId = helpers.getUser(req) && helpers.getUser(req).Likes.map(l => l.tweetId)
+        const likedTweetId = helpers.getUser(req).Likes && helpers.getUser(req).Likes.map(l => l.tweetId)
         const data = tweets.map(t => ({
           ...t.toJSON(),
-          isLiked: likedTweetId.includes(t.id),
-          replyCount: t.Replies.length,
-          likeCount: t.Likes.length
+          isLiked: likedTweetId ? likedTweetId.includes(t.id) : null,
+          replyCount: t.Replies ? t.Replies.length : null,
+          likeCount: t.Likes ? t.Likes.length : null
         }))
         let userData = users.map(u => ({
           ...u.toJSON(),
@@ -43,6 +43,7 @@ const tweetController = {
   postTweet: (req, res, next) => {
     const { content } = req.body
     if (!content) throw new Error('Please enter tweet content!')
+    if (content.length > 140) throw new Error('Content exceeds length limitation!')
 
     return Tweet.create({
       userId: helpers.getUser(req).id,
@@ -95,7 +96,7 @@ const tweetController = {
   },
   getTweet: (req, res, next) => {
     return Promise.all([
-      Tweet.findByPk(req.params.id, {
+      Tweet.findByPk(req.params.tweetId, {
         nest: true,
         include: [
           User,
@@ -116,18 +117,19 @@ const tweetController = {
     ])
       .then(([tweet, users]) => {
         if (!tweet) throw new Error("Tweet doesn't exist!")
-        const likedTweetId = helpers.getUser(req) && helpers.getUser(req).Likes.map(l => l.tweetId)
+        const likedTweetId = helpers.getUser(req).Likes && helpers.getUser(req).Likes.map(l => l.tweetId)
         const data = {
           ...tweet.toJSON(),
-          replyCount: tweet.Replies.length,
-          likeCount: tweet.Likes.length,
-          isLiked: likedTweetId.includes(tweet.id)
+          replyCount: tweet.Replies ? tweet.Replies.length : null,
+          likeCount: tweet.Likes ? tweet.Likes.length : null,
+          isLiked: likedTweetId ? likedTweetId.includes(tweet.id) : null
         }
         let userData = users.map(u => ({
           ...u.toJSON(),
           isFollowed: helpers.getUser(req).Followings.some(f => f.id === u.id),
           FollowerCount: u.Followers.length
         }))
+        console.log(data)
         userData = userData.sort((a, b) => b.FollowerCount - a.FollowerCount).slice(0, 10)
         res.render('tweet', { tweet: data, users: userData, user: helpers.getUser(req) })
       })

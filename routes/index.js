@@ -19,8 +19,10 @@ router.get('/signin', userController.signInPage)
 router.post('/signin', passport.authenticate('local', { failureRedirect: '/signin', failureFlash: true }), userController.signIn)
 router.get('/logout', userController.logout)
 
-router.get('/tweets/:id', authenticated, tweetController.getTweet)
-router.post('/tweets/:id', authenticated, commentController.postComment)
+router.get('/tweets/:tweetId/replies', authenticated, tweetController.getTweet)
+router.post('/tweets/:tweetId/replies', authenticated, commentController.postComment)
+router.post('/tweets/:tweetId/like', authenticated, tweetController.addLike)
+router.post('/tweets/:tweetId/unlike', authenticated, tweetController.removeLike)
 router.get('/tweets', authenticated, tweetController.getTweets)
 router.post('/tweets', authenticated, tweetController.postTweet)
 
@@ -29,17 +31,15 @@ router.get('/users/:userId/replies', authenticated, userController.getReplies)
 router.get('/users/:userId/likes', authenticated, userController.getLikes)
 router.get('/users/:userId/followings', authenticated, userController.getFollowings)
 router.get('/users/:userId/followers', authenticated, userController.getFollowers)
-router.post('/users/:userId/profile', authenticated, upload.fields([
-  { name: 'avatar', maxCount: 1 }, { name: 'cover', maxCount: 1 }]), userController.postProfile)
+router.get('/users/:userId/settings', authenticated, userController.getSettings)
+router.post('/users/:userId/settings', authenticated, userController.postSettings)
 
 router.get('/api/users/:userId', authenticated, userController.getUser)
-router.post('/api/users/:userId', authenticated, userController.postUser)
+router.post('/api/users/:userId', authenticated, upload.fields([
+  { name: 'avatar', maxCount: 1 }, { name: 'cover', maxCount: 1 }]), userController.postProfile)
 
-router.post('/like/:tweetId', authenticated, tweetController.addLike)
-router.delete('/like/:tweetId', authenticated, tweetController.removeLike)
-
-router.post('/following/:userId', authenticated, userController.addFollowing)
-router.delete('/following/:userId', authenticated, userController.removeFollowing)
+router.post('/followships', authenticated, userController.addFollowing)
+router.delete('/followships/:userId', authenticated, userController.removeFollowing)
 
 router.use('/', (req, res) => res.redirect('/tweets'))
 
